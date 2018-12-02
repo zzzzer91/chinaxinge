@@ -54,7 +54,7 @@ def main() -> None:
 
     # 抓取文章列表中文章细节
     mysql_sql = 'SELECT url, club, id, race_name, race_date, kilo, type FROM {}'.\
-        format(MYSQL_TABLE_SAVE_POST)
+        format(MYSQL_TABLE_SAVE_POST[0])
     spider.run_multi_thread_spider(spider.MultiThreadPostDetailSpider,
                                    MYSQL_TABLE_SAVE_PIGEON,
                                    THREAD_NUM_POST_DETAIL,
