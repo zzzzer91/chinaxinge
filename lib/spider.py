@@ -32,7 +32,7 @@ class MultiThreadSpider(threading.Thread):
     def __init__(self,
                  name: str,
                  mysql_config: MysqlConfig,
-                 table_save: str,
+                 table_save: List[str],
                  daemon: bool=True) -> None:
         super().__init__(name=name, daemon=daemon)
 
@@ -61,17 +61,18 @@ class MultiThreadSpider(threading.Thread):
 
     def save(self, item: PostDetailDict) -> None:
         if not self.sql_insert:
-            self.sql_insert = 'INSERT INTO {} ({}) VALUES ({})'.format(
-                self.table_save,
+            self.sql_insert = 'INSERT INTO {{}} ({}) VALUES ({})'.format(
                 ', '.join(item),
                 ', '.join(f'%({k})s' for k in item)
             )
-        try:
-            self.cursor.execute(self.sql_insert, item)
-        except pymysql.IntegrityError:
-            pass
-        except pymysql.err.Warning:  # 过滤不合法 mysql 类型
-            pass
+        # 一份数据，要存多个表
+        for tb in self.table_save:
+            try:
+                self.cursor.execute(self.sql_insert.format(tb), item)
+            except pymysql.IntegrityError:
+                pass
+            except pymysql.err.Warning:  # 过滤不合法 mysql 类型
+                pass
 
     def terminate(self) -> None:
         self._running = False
@@ -100,7 +101,7 @@ class MultiThreadPostListSpider(MultiThreadSpider):
     def __init__(self,
                  name: str,
                  mysql_config: MysqlConfig,
-                 table_save:  str,
+                 table_save:  List[str],
                  daemon: bool=True) -> None:
         super().__init__(name, mysql_config, table_save, daemon)
 
@@ -151,7 +152,7 @@ class MultiThreadPostDetailSpider(MultiThreadSpider):
     def __init__(self,
                  name: str,
                  mysql_config: MysqlConfig,
-                 table_save:  str,
+                 table_save:  List[str],
                  daemon: bool=True) -> None:
         super().__init__(name, mysql_config, table_save, daemon)
 
@@ -223,14 +224,14 @@ class MultiThreadPostDetailSpider(MultiThreadSpider):
 
 def run_multi_thread_spider(
         spider_class: Type[MultiThreadSpider],
-        save_table:  str,
+        table_save:  List[str],
         thread_num: int,
         mysql_sql: str,
         mysql_config: MysqlConfig) -> None:
     """创建爬虫任务。
 
     :param spider_class: 爬虫类。
-    :param save_table: 爬虫抓取数据后保存到的表。
+    :param table_save: 爬虫抓取数据后保存到的表。
     :param thread_num: 线程数量。
     :param mysql_sql: 创建任务队列，所执行的 mysql 语句。
     :param mysql_config: mysql 配置。
@@ -244,7 +245,7 @@ def run_multi_thread_spider(
     thread_list: List[MultiThreadSpider] = []
     for i in range(thread_num):
         t = spider_class(
-            f'thread{i+1}', mysql_config, save_table
+            f'thread{i+1}', mysql_config, table_save
         )
         thread_list.append(t)
 
