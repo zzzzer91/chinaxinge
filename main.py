@@ -42,6 +42,15 @@ def insert_end_time(work_time_id: int) -> None:
 
 def main() -> None:
 
+    # 清空临时表
+    db.truncate_table(MYSQL_CONFIG, MYSQL_TABLE_SAVE_POST[0])
+
+    # 获取最后抓取时间，保存于类变量中
+    spider.MultiThreadPostListSpider.get_last_fetch_time(MYSQL_CONFIG)
+
+    # 创建本次抓取开始时间
+    work_time_id = insert_start_time()
+
     # 抓取文章列表
     mysql_sql = 'SELECT gp_id, name FROM {}'.format(MYSQL_TABLE_READ_ID)
     spider.run_multi_thread_spider(spider.MultiThreadPostListSpider,
@@ -49,8 +58,6 @@ def main() -> None:
                                    THREAD_NUM_POST_LIST,
                                    mysql_sql,
                                    MYSQL_CONFIG)
-    # 这行必须放在 MultiThreadPostListSpider 后面，因为 start_time 会被先创建
-    work_time_id = insert_start_time()
 
     # 抓取文章列表中文章细节
     mysql_sql = 'SELECT url, club, id, race_name, race_date, kilo, type FROM {}'.\
@@ -61,6 +68,7 @@ def main() -> None:
                                    mysql_sql,
                                    MYSQL_CONFIG)
 
+    # 插入本次抓取结束时间
     insert_end_time(work_time_id)
 
 

@@ -43,3 +43,19 @@ def read_data(mysql_config: MysqlConfig, sql: str) -> List[Tuple]:
     mysql_conn.close()
 
     return cursor.fetchall()
+
+
+def truncate_table(mysql_config: MysqlConfig, table: str) -> None:
+    """清空指定表。"""
+
+    mysql_conn = pymysql.connect(
+        host=mysql_config['host'], port=mysql_config['port'],
+        user=mysql_config['user'], password=mysql_config['pwd'],
+        db=mysql_config['db']
+    )
+    cursor = mysql_conn.cursor()
+
+    cursor.execute(f'TRUNCATE TABLE {table}')
+
+    cursor.close()
+    mysql_conn.close()

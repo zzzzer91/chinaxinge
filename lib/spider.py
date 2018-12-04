@@ -98,15 +98,15 @@ class MultiThreadPostListSpider(MultiThreadSpider):
 
     url_gp_temp: str = 'http://gdgp.chinaxinge.com/style/mo2/default.asp?gp_id='
 
+    # 上一次抓取时间，用于过滤抓取过的文章
+    last_fetch_time: Optional[datetime] = None
+
     def __init__(self,
                  name: str,
                  mysql_config: MysqlConfig,
                  table_save:  List[str],
                  daemon: bool=True) -> None:
         super().__init__(name, mysql_config, table_save, daemon)
-
-        # 上一次抓取时间，用于过滤抓取过的文章
-        self.last_fetch_time = self.get_last_fetch_time(mysql_config)
 
     def run(self) -> None:
 
@@ -142,9 +142,9 @@ class MultiThreadPostListSpider(MultiThreadSpider):
         log.logger.info(f'PostListSpider {self.name} 结束')
 
     @classmethod
-    def get_last_fetch_time(cls, mysql_config: MysqlConfig) -> datetime:
+    def get_last_fetch_time(cls, mysql_config: MysqlConfig) -> None:
         mysql_sql = 'SELECT start_time from spider_work_time ORDER BY id DESC limit 1'
-        return db.read_data(mysql_config, mysql_sql)[0][0]
+        cls.last_fetch_time = db.read_data(mysql_config, mysql_sql)[0][0]
 
 
 class MultiThreadPostDetailSpider(MultiThreadSpider):
@@ -206,6 +206,9 @@ class MultiThreadPostDetailSpider(MultiThreadSpider):
                             yield from parser.parse_gp_post_asp(r2)
                     else:
                         yield from parser.parse_gp_post_asp(response)
+            else:
+                log.logger.error('对应解析方式不存在！')
+                exit(1)
 
             for item in parse(r):
                 item['club'] = club
