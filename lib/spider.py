@@ -33,7 +33,7 @@ class MultiThreadSpider(threading.Thread):
                  name: str,
                  mysql_config: MysqlConfig,
                  table_save: List[str],
-                 daemon: bool=True) -> None:
+                 daemon: bool = True) -> None:
         super().__init__(name=name, daemon=daemon)
 
         atexit.register(self.close)  # 注册清理函数，线程结束时自动调用
@@ -105,7 +105,7 @@ class MultiThreadPostListSpider(MultiThreadSpider):
                  name: str,
                  mysql_config: MysqlConfig,
                  table_save:  List[str],
-                 daemon: bool=True) -> None:
+                 daemon: bool = True) -> None:
         super().__init__(name, mysql_config, table_save, daemon)
 
     def run(self) -> None:
@@ -153,7 +153,7 @@ class MultiThreadPostDetailSpider(MultiThreadSpider):
                  name: str,
                  mysql_config: MysqlConfig,
                  table_save:  List[str],
-                 daemon: bool=True) -> None:
+                 daemon: bool = True) -> None:
         super().__init__(name, mysql_config, table_save, daemon)
 
     def run(self) -> None:
