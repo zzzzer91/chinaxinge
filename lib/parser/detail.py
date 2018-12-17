@@ -47,6 +47,8 @@ def _get_col_index_extra(td_list: List[str]) -> Dict[str, int]:
             d_row_index['area'] = i
         elif col in keyword.COL_NO:
             d_row_index['no'] = i
+        elif col in keyword.COL_NO2:
+            d_row_index['no2'] = i
     return d_row_index
 
 
@@ -78,6 +80,10 @@ def _parse_htm(html: str) -> Iterator[PostDetailDict]:
         return
 
     d_row_index.update(_get_col_index_extra(td_list))
+
+    # 将序号作为名次
+    if 'no' not in d_row_index and 'no2' in d_row_index:
+        d_row_index['no'] = d_row_index['no2']
 
     log.logger.debug(str(d_row_index))
 

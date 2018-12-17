@@ -30,8 +30,8 @@ COL_NUMBER: FrozenSet[str] = frozenset(lst[3].split('\n'))       # 足环号
 COL_FEATHER: FrozenSet[str] = frozenset(lst[4].split('\n'))      # 羽色
 COL_SPEED: FrozenSet[str] = frozenset(lst[5].split('\n'))        # 分速
 COL_TIME: FrozenSet[str] = frozenset(lst[6].split('\n'))         # 归巢时间
+COL_NO2: FrozenSet[str] = frozenset(lst[7].split('\n'))           # 排名
 COL_COUNT_MUST: int = 2                                          # 必须列数量
-COL_COUNT_EXTRA: int = 5                                         # 额外列数量
 
 del lst
 
@@ -41,7 +41,8 @@ def test() -> None:
     print(TITLE_QINGPENG, TITLE_SHANGLONG, TITLE_ELIMINATE,
           TITLE_GROUP1, TITLE_GROUP2, TITLE_GROUP3)
     print(COL_NO, COL_NAME, COL_AREA,
-          COL_NUMBER, COL_FEATHER, COL_SPEED, COL_TIME)
+          COL_NUMBER, COL_FEATHER, COL_SPEED, COL_TIME,
+          COL_NO2)
 
 
 if __name__ == '__main__':
