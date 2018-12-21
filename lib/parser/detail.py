@@ -49,6 +49,16 @@ def _get_col_index_extra(td_list: List[str]) -> Dict[str, int]:
             d_row_index['no'] = i
         elif col in keyword.COL_NO2:
             d_row_index['no2'] = i
+
+    # 不存在名次则将序号作为名次
+    if 'no' not in d_row_index and 'no2' in d_row_index:
+        d_row_index['no'] = d_row_index['no2']
+
+    try:
+        d_row_index.pop('no2')
+    except KeyError:
+        pass
+
     return d_row_index
 
 
@@ -80,15 +90,6 @@ def _parse_htm(html: str) -> Iterator[PostDetailDict]:
         return
 
     d_row_index.update(_get_col_index_extra(td_list))
-
-    # 将序号作为名次
-    if 'no' not in d_row_index and 'no2' in d_row_index:
-        d_row_index['no'] = d_row_index['no2']
-
-    try:
-        d_row_index.pop('no2')
-    except KeyError:
-        pass
 
     log.logger.debug(str(d_row_index))
 

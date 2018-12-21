@@ -23,7 +23,7 @@ class MultiThreadSpider(threading.Thread):
         'User-Agent': 'Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko)',
         'Accept': 'text/html,application/xhtml+xml,application/xml;'
                   'q=0.9,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Encoding': 'gzip, deflate, br',
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7'
     }
 
@@ -72,7 +72,7 @@ class MultiThreadSpider(threading.Thread):
             except pymysql.IntegrityError:
                 pass
             except pymysql.err.Warning:  # 过滤不合法 mysql 类型
-                pass
+                log.logger.error('错误类型：' + str(item))
 
     def terminate(self) -> None:
         self._running = False
